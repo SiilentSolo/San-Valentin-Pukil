@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Quieres ser mi San Valentín?</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url(https://wallpapers.com/images/featured/imagenes-lindas-rosa-khxhiw7p4s242fg0.jpg); /* Cambia esta URL por la de tu imagen */
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      color: #e96dd0;
+    }
+    .container {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    button {
+      background-color: #f1faee;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin: 10px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #a8dadc;
+    }
+    .options {
+      display: none;
+      margin-top: 20px;
+    }
+    .option-button {
+      display: block;
+      margin: 10px auto;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .no-thanks {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Valita, ¿quieres ser mi San Valentín?</h1>
+  <h4>Perdón la tardanza u.u</h4>
+  <button id="yesButton">¡Sí!</button>
+  <button id="noButton">No, gracias</button>
+  
+  <div class="options" id="options">
+    <!-- Esta sección se mostrará cuando se haga clic en "¡Sí!" -->
+    <h2>Gracias por decir que sí, te amo</h2>
+    <img src="https://media.istockphoto.com/id/622923118/es/foto/gatito-gris-y-coraz%C3%B3n-rojo.jpg?s=612x612&w=0&k=20&c=r0ioHIY17ALyx_0ybu9IT3w9CUzgH_LpOzWqWgkMcoY=" alt="Imagen en el cuerpo" style="max-width: 50%; height: auto;">
+    <h2>¿Qué te gustaría hacer?</h2>
+    <h4>Ten en cuenta lo obvio: sea lo que elijas, hay que hacerlo bonito y vestirnos bonitos, ¡que se note que es una cita de San Valentín! (●'◡'●)</h4>
+    <!-- Botones de opciones (con "this" para cambiar estilo) -->
+    <button class="option-button" onclick="selectOption('Playa', this)">Playa y picnic</button>
+    <button class="option-button" onclick="selectOption('Sushi', this)">Sushi y ramen en Domu</button>
+    <button class="option-button" onclick="selectOption('Cine', this)">Cine, es solo una opción, ok?</button>
+    <button class="option-button" onclick="selectOption('Mi casa', this)">Mi casa, podemos ver películas y cocinar algo como pizza</button>
+    <button class="option-button" onclick="showCustomOption()">También puedes dejar tu sugerencia jijij</button>
+    <input type="text" id="customOption" placeholder="Escribe tu sugerencia mi amor" style="display:none;">
+    <button id="submitCustom" style="display:none;" onclick="submitCustomOption()">Enviar</button>
+    <h3>Selecciona la fecha de nuestra cita:</h3>
+    <input type="date" id="fecha" name="fecha" required>
+    <div>
+      <button id="finalConfirm" onclick="finalConfirm()">Confirmar</button>
+      <button id="resetButton" onclick="showResetContainer()">Oye...</button>
+    </div>
+  </div>
+
+  <div class="no-thanks" id="noThanks">
+    <img src="https://img.freepik.com/fotos-premium/perrito-lindo-tan-sonoliento_1840-60.jpg?semt=ais_hybrid" alt="Chanfle" style="max-width: 50%; height: auto;">
+    <h1>¿Segura?</h1>
+    <h3>Pero, ¿así de que realmente segura? 😢</h3>
+    <h4>Y si mejor dices que sí? :D</h4>
+    <button id="anotherYesButton">¡Meno, está bien!</button>
+  </div>
+</div>
+
+<script>
+  // Variables globales para almacenar la(s) opción(es) seleccionada(s) y la fecha final
+  var selectedOptions = [];
+  var finalFecha = '';
+
+  // Guardamos el contenido de la pantalla de opciones en una variable para poder restaurarlo luego.
+  var optionsContent = `
+    <h2>Gracias por decir que sí, te amo</h2>
+    <img src="https://media.istockphoto.com/id/622923118/es/foto/gatito-gris-y-coraz%C3%B3n-rojo.jpg?s=612x612&w=0&k=20&c=r0ioHIY17ALyx_0ybu9IT3w9CUzgH_LpOzWqWgkMcoY=" alt="Imagen en el cuerpo" style="max-width: 50%; height: auto;">
+    <h2>¿Qué te gustaría hacer?</h2>
+    <h4>Ten en cuenta lo obvio: sea lo que elijas, hay que hacerlo bonito y vestirnos bonitos, ¡que se note que es una cita de San Valentín! (●'◡'●)</h4>
+    <button class="option-button" onclick="selectOption('Playa', this)">Playa y picnic</button>
+    <button class="option-button" onclick="selectOption('Sushi', this)">Sushi y ramen en Domu</button>
+    <button class="option-button" onclick="selectOption('Cine', this)">Cine, es solo una opción, ok?</button>
+    <button class="option-button" onclick="selectOption('Mi casa', this)">Mi casa, podemos ver películas y cocinar algo como pizza</button>
+    <button class="option-button" onclick="showCustomOption()">También puedes dejar tu sugerencia jijij</button>
+    <input type="text" id="customOption" placeholder="Escribe tu opción aquí" style="display:none;">
+    <button id="submitCustom" style="display:none;" onclick="submitCustomOption()">Enviar</button>
+    <h3>Selecciona la fecha de nuestra cita:</h3>
+    <input type="date" id="fecha" name="fecha" required>
+    <div>
+      <button id="finalConfirm" onclick="finalConfirm()">Confirmar</button>
+      <button id="resetButton" onclick="showResetContainer()">Oye...</button>
+    </div>
+  `;
+
+  // Manejo de botones iniciales
+  document.getElementById('yesButton').onclick = function() {
+    document.getElementById('options').style.display = 'block';
+    document.getElementById('noThanks').style.display = 'none';
+    this.style.display = 'none';
+    document.getElementById('noButton').style.display = 'none';
+  };
+
+  document.getElementById('noButton').onclick = function() {
+    document.getElementById('options').style.display = 'none';
+    document.getElementById('noThanks').style.display = 'block';
+    this.style.display = 'none';
+    document.getElementById('yesButton').style.display = 'none';
+  };
+
+  document.getElementById('anotherYesButton') &&
+  (document.getElementById('anotherYesButton').onclick = function() {
+    document.getElementById('options').style.display = 'block';
+    document.getElementById('noThanks').style.display = 'none';
+    document.getElementById('yesButton').style.display = 'none';
+    document.getElementById('noButton').style.display = 'none';
+  });
+
+  // Función para seleccionar o deseleccionar una opción (sin límite)
+  function selectOption(option, btn) {
+    var index = selectedOptions.indexOf(option);
+    if (index !== -1) {
+      // Si ya está seleccionada, la deselecciona y restaura el estilo
+      selectedOptions.splice(index, 1);
+      btn.style.backgroundColor = "#f1faee";
+      return;
+    }
+    selectedOptions.push(option);
+    btn.style.backgroundColor = "#a8dadc";
+  }
+
+  // Muestra el input para la opción personalizada
+  function showCustomOption() {
+    document.getElementById('customOption').style.display = 'block';
+    document.getElementById('submitCustom').style.display = 'block';
+  }
+
+  // Procesa la opción personalizada y la añade a las seleccionadas
+  function submitCustomOption() {
+    const customInput = document.getElementById('customOption');
+    const customValue = customInput.value.trim();
+    if (!customValue) {
+      alert('Por favor, escribe una opción.');
+      return;
+    }
+    if (selectedOptions.indexOf(customValue) !== -1) {
+      alert('Ya seleccionaste esa opción.');
+      return;
+    }
+    selectedOptions.push(customValue);
+    alert('¡Increíble amor! Has elegido: ' + customValue);
+    customInput.disabled = true;
+    document.getElementById('submitCustom').disabled = true;
+  }
+
+  // Función que muestra el mensaje final (container en blanco) con la información confirmada y un botón para enviar correo
+  function finalConfirm() {
+    var fecha = document.getElementById('fecha').value;
+    if (selectedOptions.length < 1) {
+      alert("Por favor, selecciona al menos 1 opción.");
+      return;
+    }
+    if (!fecha) {
+      alert("Pon fecha, amor c:");
+      return;
+    }
+    finalFecha = fecha;
+    var container = document.querySelector('.container');
+    container.innerHTML = `
+      <h1>¡Perfecto Pukita!</h1>
+      <h4>Entonces ya sabemos qué haremos...</h4>
+      <p>Vamos a <strong>${selectedOptions.join(', ')}</strong> el <strong>${fecha}</strong>.</p>
+      <h4>Te amo muchote</h4>
+      <h4>💟💟💟</h4>
+      <img src="https://img.posterstore.com/zoom/18197-8snoopylove50x70-23204-14418.jpg?auto=compress,format&fit=max&w=3840" alt="Imagen de Confirmación" style="max-width: 70%; height: auto;">
+      <button onclick="sendEmail()">Envíamelo a mi correo ;)</button>
+    `;
+  }
+
+  // Función que abre el cliente de correo con la información preconfigurada
+  function sendEmail() {
+    var subject = "Confirmación de nuestra cita";
+    var body = "Hola,\n\nConfirmo que vamos a " + selectedOptions.join(", ") + " el " + finalFecha + ".\n\nTe amo.";
+    window.location.href = "mailto:aviel_sorela@hotmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  }
+
+  // Función que muestra otro container en blanco con un mensaje, imagen y un botón para volver a la pantalla de opciones
+  function showResetContainer() {
+    var container = document.querySelector('.container');
+    container.innerHTML = `
+      <h1>LO SIENTO</h1>
+      <p>Lamento haberte hecho enojar ayer, yo realmente ya tenia planes y esto ya estaba empezado, me perdì en el tiempo hasta que me recordaste que ya es bastante tarde para andar haciendo estas cosas, sin embargo te prometo que ésto está hecho con mucho amor, solo para ti y por ti</p>
+      <p>Disculpa porque siempre tienes que decirme todo y lo siento porque tal vez ya no se siente tan especial :C</p>
+      <h4>Aun asì, espero te guste. Te amo mucho🤍</h4>
+      <img src="https://media.istockphoto.com/id/89327871/es/foto/triste-mascota.jpg?s=612x612&w=0&k=20&c=hz2RhZ0RJQm5H2YkhO-Vu9RrtJgmdFIaoE8Bl-7HcPw=" alt="Imagen" style="max-width:70%; height:auto;">
+       <img src="https://media.istockphoto.com/id/1202736342/es/foto/flores-de-peon%C3%ADa-sobre-un-fondo-blanco.jpg?s=612x612&w=0&k=20&c=4bMUS3ohSuoilgCmAWYtgpDrJYkJxaH4d3zL9zt5k_Q=" style="max-width:70%; height:auto;">
+      <p>Pssst... Son peonias para ti</p>
+      <br>
+      <button onclick="backToOptions()">Pukiregreso</button>
+    `;
+  }
+
+  // Función que restaura la pantalla de opciones (la que se muestra tras haber aceptado ser mi San Valentín)
+  function backToOptions() {
+    var container = document.querySelector('.container');
+    // Reconstruimos el contenido con el título inicial y el contenido de opciones guardado
+    container.innerHTML = `
+      <h1>Valita, ya elegiste ser mi San Valentín</h1>
+      ${optionsContent}
+    `;
+  }
+</script>
+
+</body>
+</html>
